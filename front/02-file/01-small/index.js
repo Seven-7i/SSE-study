@@ -17,7 +17,7 @@ btn_start.addEventListener("click", function () {
     alert("当前浏览器不支持SSE")
     throw new Error("当前浏览器不支持SSE")
   }
-  source = new EventSource('http://localhost:8088/sse/');
+  source = new EventSource('http://localhost:8088/sse/file');
   source.onopen = onConnectOpen;
   source.onmessage = onConnectMessage;
   source.onerror = onConnectError;
@@ -47,7 +47,7 @@ function onConnectOpen(event, a, b) {
 function onConnectMessage(event, a, b) {
   console.log(JSON.parse(event.data));
   console.log("收到长连接信息", event, a, b);
-  // createLi();
+  createLi(JSON.parse(event.data));
 };
 
 //对断开链接的监听

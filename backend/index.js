@@ -4,6 +4,7 @@ const port = 8088; //项目启动端口
 
 //设置跨域访问
 app.all("*", function (req, res, next) {
+  console.log("跨域请求", req)
   //设置允许跨域的域名，*代表允许任意域名跨域
   res.header("Access-Control-Allow-Origin", '*');
   //允许的header类型
@@ -21,22 +22,31 @@ app.all("*", function (req, res, next) {
 
 let timer = null;
 
+app.get('/test', (req, res) => {
+  console.log('test', req)
+  res.send('hello world')
+})
+
 app.get("/sse", (req, res) => {
   res.set({
     'Content-Type': 'text/event-stream', //设定数据类型
     'Cache-Control': 'no-cache',// 长链接拒绝缓存
     'Connection': 'keep-alive' //设置长链接
   });
+  console.log(req.headers['last-event-id'])
 
   console.log("进入到长连接了")
   //持续返回数据
   timer = setInterval(() => {
-    console.log("正在持续返回数据中ing")
+    // console.log("正在持续返回数据中ing")
     const data = {
       message: `Current time is ${new Date().toLocaleTimeString()}`
     };
+    res.write('retry: 10000\n')
+    res.write(`id: ${Date.now()}\n`)
     res.write(`data: ${JSON.stringify(data)}\n\n`);
-  }, 1000);
+  }, 10000);
+  if (!timer) res.write("data: 没有长连接\n\n");
 })
 
 app.post("/sse/close", (req, res) => {
